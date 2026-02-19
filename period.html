@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Period Time Table - New Vision School</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a67d8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .day-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .day-btn {
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .day-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .timetable {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .period-card {
+            display: grid;
+            grid-template-columns: 100px 1fr 150px;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            align-items: center;
+        }
+
+        .period-card:last-child {
+            border-bottom: none;
+        }
+
+        .period-time {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .period-subject {
+            font-size: 1.1rem;
+        }
+
+        .period-teacher {
+            color: #666;
+            font-style: italic;
+        }
+
+        .break-card {
+            background: #f0f4f8;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            color: #2d3748;
+            font-weight: bold;
+        }
+
+        .current-period {
+            background: #c6f6d5;
+            border-radius: 5px;
+            padding: 0.2rem 0.5rem;
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .current-time {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .period-card {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⏰ Period Time Table</h1>
+        <a href="index.html" class="back-btn">← Back to Home</a>
+    </div>
+
+    <div class="container">
+        <div class="info-bar">
+            <div class="current-time" id="currentTime"></div>
+            <div id="currentPeriod"></div>
+        </div>
+
+        <div class="day-selector" id="daySelector">
+            <button class="day-btn active" onclick="changeDay('monday')">Monday</button>
+            <button class="day-btn" onclick="changeDay('tuesday')">Tuesday</button>
+            <button class="day-btn" onclick="changeDay('wednesday')">Wednesday</button>
+            <button class="day-btn" onclick="changeDay('thursday')">Thursday</button>
+            <button class="day-btn" onclick="changeDay('friday')">Friday</button>
+        </div>
+
+        <div class="timetable" id="timetable">
+            <!-- Timetable will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Default timetable data
+        const defaultTimetable = {
+            monday: [
+                { time: '08:00 - 08:45', subject: 'Mathematics', teacher: 'Mr. Sharma' },
+                { time: '08:45 - 09:30', subject: 'Science', teacher: 'Mrs. Patel' },
+                { type: 'break', name: 'Morning Break', time: '09:30 - 10:00' },
+                { time: '10:00 - 10:45', subject: 'English', teacher: 'Ms. Gupta' },
+                { time: '10:45 - 11:30', subject: 'Hindi', teacher: 'Mr. Verma' },
+                { type: 'break', name: 'Lunch Break', time: '11:30 - 12:30' },
+                { time: '12:30 - 13:15', subject: 'Social Studies', teacher: 'Mrs. Singh' },
+                { time: '13:15 - 14:00', subject: 'Computer Science', teacher: 'Mr. Kumar' }
+            ],
+            tuesday: [
+                { time: '08:00 - 08:45', subject: 'Science', teacher: 'Mrs. Patel' },
+                { time: '08:45 - 09:30', subject: 'Mathematics', teacher: 'Mr. Sharma' },
+                { type: 'break', name: 'Morning Break', time: '09:30 - 10:00' },
+                { time: '10:00 - 10:45', subject: 'Hindi', teacher: 'Mr. Verma' },
+                { time: '10:45 - 11:30', subject: 'English', teacher: 'Ms. Gupta' },
+                { type: 'break', name: 'Lunch Break', time: '11:30 - 12:30' },
+                { time: '12:30 - 13:15', subject: 'Computer Science', teacher: 'Mr. Kumar' },
+                { time: '13:15 - 14:00', subject: 'Physical Education', teacher: 'Coach Ali' }
+            ],
+            wednesday: [
+                { time: '08:00 - 08:45', subject: 'English', teacher: 'Ms. Gupta' },
+                { time: '08:45 - 09:30', subject: 'Mathematics', teacher: 'Mr. Sharma' },
+                { type: 'break', name: 'Morning Break', time: '09:30 - 10:00' },
+                { time: '10:00 - 10:45', subject: 'Science', teacher: 'Mrs. Patel' },
+                { time: '10:45 - 11:30', subject: 'Social Studies', teacher: 'Mrs. Singh' },
+                { type: 'break', name: 'Lunch Break', time: '11:30 - 12:30' },
+                { time: '12:30 - 13:15', subject: 'Art', teacher: 'Mr. Joshi' },
+                { time: '13:15 - 14:00', subject: 'Music', teacher: 'Ms. Reddy' }
+            ],
+            thursday: [
+                { time: '08:00 - 08:45', subject: 'Social Studies', teacher: 'Mrs. Singh' },
+                { time: '08:45 - 09:30', subject: 'Science', teacher: 'Mrs. Patel' },
+                { type: 'break', name: 'Morning Break', time: '09:30 - 10:00' },
+                { time: '10:00 - 10:45', subject: 'Mathematics', teacher: 'Mr. Sharma' },
+                { time: '10:45 - 11:30', subject: 'English', teacher: 'Ms. Gupta' },
+                { type: 'break', name: 'Lunch Break', time: '11:30 - 12:30' },
+                { time: '12:30 - 13:15', subject: 'Hindi', teacher: 'Mr. Verma' },
+                { time: '13:15 - 14:00', subject: 'Computer Science', teacher: 'Mr. Kumar' }
+            ],
+            friday: [
+                { time: '08:00 - 08:45', subject: 'Mathematics', teacher: 'Mr. Sharma' },
+                { time: '08:45 - 09:30', subject: 'English', teacher: 'Ms. Gupta' },
+                { type: 'break', name: 'Morning Break', time: '09:30 - 10:00' },
+                { time: '10:00 - 10:45', subject: 'Science', teacher: 'Mrs. Patel' },
+                { time: '10:45 - 11:30', subject: 'Physical Education', teacher: 'Coach Ali' },
+                { type: 'break', name: 'Lunch Break', time: '11:30 - 12:30' },
+                { time: '12:30 - 13:15', subject: 'Social Studies', teacher: 'Mrs. Singh' },
+                { time: '13:15 - 14:00', subject: 'Library', teacher: 'Ms. Khan' }
+            ]
+        };
+
+        // Load timetable from localStorage or use default
+        if (!localStorage.getItem('timetable')) {
+            localStorage.setItem('timetable', JSON.stringify(defaultTimetable));
+        }
+
+        let currentDay = 'monday';
+
+        function loadTimetable(day) {
+            const timetable = JSON.parse(localStorage.getItem('timetable'));
+            const daySchedule = timetable[day] || [];
+            const container = document.getElementById('timetable');
+            
+            container.innerHTML = '';
+            
+            daySchedule.forEach(period => {
+                if (period.type === 'break') {
+                    const breakDiv = document.createElement('div');
+                    breakDiv.className = 'break-card';
+                    breakDiv.innerHTML = `
+                        <div>☕ ${period.name}</div>
+                        <div style="font-size: 0.9rem; margin-top: 0.3rem;">${period.time}</div>
+                    `;
+                    container.appendChild(breakDiv);
+                } else {
+                    const periodDiv = document.createElement('div');
+                    periodDiv.className = 'period-card';
+                    
+                    // Check if this is the current period
+                    const isCurrent = checkCurrentPeriod(period.time);
+                    
+                    periodDiv.innerHTML = `
+                        <div class="period-time">${period.time}</div>
+                        <div class="period-subject">
+                            ${period.subject}
+                            ${isCurrent ? '<span class="current-period">Current Period</span>' : ''}
+                        </div>
+                        <div class="period-teacher">👨‍🏫 ${period.teacher}</div>
+                    `;
+                    container.appendChild(periodDiv);
+                }
+            });
+        }
+
+        function checkCurrentPeriod(periodTime) {
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            const [start, end] = periodTime.split(' - ');
+            const [startHour, startMin] = start.split(':').map(Number);
+            const [endHour, endMin] = end.split(':').map(Number);
+            
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+            
+            return currentTime >= startMinutes && currentTime <= endMinutes;
+        }
+
+        function changeDay(day) {
+            currentDay = day;
+            
+            // Update active button
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            loadTimetable(day);
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = 
+                `Current Time: ${now.toLocaleTimeString()}`;
+            
+            // Find current period
+            const timetable = JSON.parse(localStorage.getItem('timetable'));
+            const today = new Date().getDay();
+            const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            const todayName = days[today];
+            
+            if (todayName !== 'sunday' && todayName !== 'saturday' && timetable[todayName]) {
+                const currentPeriod = timetable[todayName].find(period => {
+                    if (period.type === 'break') return false;
+                    return checkCurrentPeriod(period.time);
+                });
+                
+                if (currentPeriod) {
+                    document.getElementById('currentPeriod').innerHTML = 
+                        `<span class="current-period">Now: ${currentPeriod.subject} with ${currentPeriod.teacher}</span>`;
+                } else {
+                    document.getElementById('currentPeriod').innerHTML = '';
+                }
+            }
+        }
+
+        // Load Monday by default
+        loadTimetable('monday');
+        
+        // Update time every second
+        setInterval(updateCurrentTime, 1000);
+        updateCurrentTime();
+    </script>
+</body>
+</html>
