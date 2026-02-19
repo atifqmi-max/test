@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Attendance - New Vision School</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a67d8;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .attendance-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .big-button {
+            width: 100%;
+            padding: 3rem;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 2rem;
+        }
+
+        .big-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .photo-upload {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .photo-box {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .photo-box img {
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #38a169;
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+            display: block;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            color: #742a2a;
+            display: block;
+        }
+
+        .message.warning {
+            background: #feebc8;
+            color: #744210;
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .recent-attendance {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .attendance-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Teacher Attendance System</h1>
+        <a href="index.html" class="back-btn">← Back to Home</a>
+    </div>
+
+    <div class="container">
+        <div class="attendance-card">
+            <button class="big-button" onclick="showAttendanceForm()">
+                ➕ Add Attendance
+            </button>
+
+            <div id="attendanceForm" style="display: none;">
+                <h2 style="margin-bottom: 1.5rem;">Mark Your Attendance</h2>
+                
+                <div class="form-group">
+                    <label>Teacher Token</label>
+                    <input type="text" id="token" placeholder="Enter your token" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Teacher Name</label>
+                    <input type="text" id="teacherName" placeholder="Enter your name" required>
+                </div>
+
+                <div class="photo-upload">
+                    <div class="photo-box" onclick="document.getElementById('photo1').click()">
+                        <div>📸 Upload School Photo 1</div>
+                        <input type="file" id="photo1" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview1')">
+                        <img id="preview1" style="display: none;">
+                    </div>
+                    <div class="photo-box" onclick="document.getElementById('photo2').click()">
+                        <div>📸 Upload School Photo 2</div>
+                        <input type="file" id="photo2" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview2')">
+                        <img id="preview2" style="display: none;">
+                    </div>
+                </div>
+
+                <button class="submit-btn" onclick="submitAttendance()">Submit Attendance</button>
+            </div>
+
+            <div id="message" class="message"></div>
+
+            <div class="recent-attendance">
+                <h3>Today's Attendance</h3>
+                <div id="todayAttendance"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="lateNotificationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚠️ Late Notification</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <p id="lateMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data structure
+        if (!localStorage.getItem('teachers')) {
+            const defaultTeachers = [
+                { token: 'T001', name: 'John Doe', isAdmin: false },
+                { token: 'T002', name: 'Jane Smith', isAdmin: false },
+                { token: 'ADMIN001', name: 'Principal', isAdmin: true }
+            ];
+            localStorage.setItem('teachers', JSON.stringify(defaultTeachers));
+        }
+
+        if (!localStorage.getItem('attendance')) {
+            localStorage.setItem('attendance', JSON.stringify([]));
+        }
+
+        if (!localStorage.getItem('settings')) {
+            localStorage.setItem('settings', JSON.stringify({
+                lateTime: '08:30',
+                websiteName: 'New Vision Public High School'
+            }));
+        }
+
+        function showAttendanceForm() {
+            document.getElementById('attendanceForm').style.display = 'block';
+            document.querySelector('.big-button').style.display = 'none';
+        }
+
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById(previewId);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function submitAttendance() {
+            const token = document.getElementById('token').value;
+            const name = document.getElementById('teacherName').value;
+            const photo1 = document.getElementById('photo1').files[0];
+            const photo2 = document.getElementById('photo2').files[0];
+            const messageDiv = document.getElementById('message');
+
+            // Check if token is valid
+            const teachers = JSON.parse(localStorage.getItem('teachers'));
+            const validTeacher = teachers.find(t => t.token === token && t.name === name);
+
+            if (!validTeacher) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Your Attendance Are Not Submitted - Invalid Token or Name';
+                return;
+            }
+
+            // Check if already marked attendance today
+            const attendance = JSON.parse(localStorage.getItem('attendance'));
+            const today = new Date().toDateString();
+            const alreadyMarked = attendance.some(a => 
+                a.token === token && new Date(a.date).toDateString() === today
+            );
+
+            if (alreadyMarked) {
+                messageDiv.className = 'message warning';
+                messageDiv.textContent = 'You have already marked attendance today!';
+                return;
+            }
+
+            // Check if late
+            const settings = JSON.parse(localStorage.getItem('settings'));
+            const currentTime = new Date();
+            const currentHour = currentTime.getHours();
+            const currentMinute = currentTime.getMinutes();
+            const [lateHour, lateMinute] = settings.lateTime.split(':').map(Number);
+            
+            const isLate = currentHour > lateHour || (currentHour === lateHour && currentMinute > lateMinute);
+
+            // Save attendance
+            const attendanceRecord = {
+                token: token,
+                name: name,
+                date: new Date().toISOString(),
+                isLate: isLate,
+                photo1: photo1 ? URL.createObjectURL(photo1) : null,
+                photo2: photo2 ? URL.createObjectURL(photo2) : null
+            };
+
+            attendance.push(attendanceRecord);
+            localStorage.setItem('attendance', JSON.stringify(attendance));
+
+            messageDiv.className = 'message success';
+            messageDiv.textContent = 'Your Attendance Are Done ✅';
+
+            // If late, notify everyone
+            if (isLate) {
+                const lateMessage = `${name} came late to school today at ${currentTime.toLocaleTimeString()}`;
+                document.getElementById('lateMessage').textContent = lateMessage;
+                document.getElementById('lateNotificationModal').style.display = 'flex';
+                
+                // Store notification
+                const notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+                notifications.push({
+                    message: lateMessage,
+                    date: new Date().toISOString(),
+                    type: 'late'
+                });
+                localStorage.setItem('notifications', JSON.stringify(notifications));
+            }
+
+            // Reset form
+            document.getElementById('token').value = '';
+            document.getElementById('teacherName').value = '';
+            document.getElementById('photo1').value = '';
+            document.getElementById('photo2').value = '';
+            document.getElementById('preview1').style.display = 'none';
+            document.getElementById('preview2').style.display = 'none';
+
+            // Hide form after 3 seconds
+            setTimeout(() => {
+                document.getElementById('attendanceForm').style.display = 'none';
+                document.querySelector('.big-button').style.display = 'block';
+                messageDiv.className = 'message';
+                messageDiv.textContent = '';
+                updateTodayAttendance();
+            }, 3000);
+        }
+
+        function closeModal() {
+            document.getElementById('lateNotificationModal').style.display = 'none';
+        }
+
+        function updateTodayAttendance() {
+            const attendance = JSON.parse(localStorage.getItem('attendance'));
+            const today = new Date().toDateString();
+            const todayAttendance = attendance.filter(a => new Date(a.date).toDateString() === today);
+            
+            const container = document.getElementById('todayAttendance');
+            container.innerHTML = '';
+
+            if (todayAttendance.length === 0) {
+                container.innerHTML = '<p>No attendance marked yet today</p>';
+                return;
+            }
+
+            todayAttendance.forEach(a => {
+                const time = new Date(a.date).toLocaleTimeString();
+                const div = document.createElement('div');
+                div.className = 'attendance-item';
+                div.innerHTML = `
+                    <span>${a.name}</span>
+                    <span>${time} ${a.isLate ? '⚠️ Late' : '✅'}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Update today's attendance on load
+        updateTodayAttendance();
+    </script>
+</body>
+</html>
