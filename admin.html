@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - New Vision School</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a67d8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .login-form {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 400px;
+            margin: 2rem auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .login-form h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #5a67d8;
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .card {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-right: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .btn-danger {
+            background: #f56565;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn-success {
+            background: #48bb78;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f7fafc;
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1001;
+        }
+
+        .notification.success {
+            border-left: 4px solid #48bb78;
+        }
+
+        .notification.error {
+            border-left: 4px solid #f56565;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👨‍💼 Admin Panel - New Vision Public High School</h1>
+        <a href="index.html" class="back-btn">← Back to Home</a>
+    </div>
+
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-form" id="loginForm">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="adminEmail" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter password">
+            </div>
+            <button class="login-btn" onclick="adminLogin()">Login</button>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+                <button class="tab-btn" onclick="switchTab('teachers')">👨‍🏫 Teachers</button>
+                <button class="tab-btn" onclick="switchTab('attendance')">📋 Attendance</button>
+                <button class="tab-btn" onclick="switchTab('timetable')">⏰ Time Table</button>
+                <button class="tab-btn" onclick="switchTab('categories')">📑 Categories</button>
+                <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+                <button class="tab-btn" onclick="switchTab('admins')">👥 Admins</button>
+                <button class="tab-btn" onclick="switchTab('notifications')">🔔 Notifications</button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Dashboard Tab -->
+                <div class="tab-pane active" id="dashboard">
+                    <h2>Dashboard Overview</h2>
+                    <div class="stats-grid" id="dashboardStats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalTeachersStat">0</div>
+                            <div class="stat-label">Total Teachers</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="presentTodayStat">0</div>
+                            <div class="stat-label">Present Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="lateTodayStat">0</div>
+                            <div class="stat-label">Late Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="attendanceRateStat">0%</div>
+                            <div class="stat-label">Attendance Rate</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Recent Attendance</h3>
+                        <table id="recentAttendanceTable">
+                            <thead>
+                                <tr>
+                                    <th>Teacher</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentAttendanceBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Teachers Tab -->
+                <div class="tab-pane" id="teachers">
+                    <h2>Manage Teachers</h2>
+                    <button class="btn btn-success" onclick="showAddTeacherModal()">➕ Add New Teacher</button>
+                    <input type="text" class="search-box" id="teacherSearch" placeholder="Search teachers..." onkeyup="searchTeachers()">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Token</th>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teachersTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Attendance Tab -->
+                <div class="tab-pane" id="attendance">
+                    <h2>Attendance History</h2>
+                    <input type="date" id="attendanceDate" onchange="filterAttendanceByDate()">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Teacher</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Time Table Tab -->
+                <div class="tab-pane" id="timetable">
+                    <h2>Edit Time Table</h2>
+                    <select id="daySelect" onchange="loadTimetableForEdit()">
+                        <option value="monday">Monday</option>
+                        <option value="tuesday">Tuesday</option>
+                        <option value="wednesday">Wednesday</option>
+                        <option value="thursday">Thursday</option>
+                        <option value="friday">Friday</option>
+                    </select>
+                    <div id="timetableEditor"></div>
+                    <button class="btn btn-success" onclick="saveTimetable()">Save Changes</button>
+                </div>
+
+                <!-- Categories Tab -->
+                <div class="tab-pane" id="categories">
+                    <h2>Manage Categories</h2>
+                    <div class="form-group">
+                        <input type="text" id="newCategory" placeholder="New category name">
+                        <button class="btn btn-success" onclick="addCategory()">Add Category</button>
+                    </div>
+                    <div id="categoriesList"></div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div class="tab-pane" id="settings">
+                    <h2>Settings</h2>
+                    <div class="card">
+                        <h3>Late Time Setting</h3>
+                        <label>Set Late Time:</label>
+                        <input type="time" id="lateTimeSetting">
+                        <button class="btn" onclick="saveLateTime()">Save</button>
+                    </div>
+                    <div class="card">
+                        <h3>Website Name</h3>
+                        <input type="text" id="websiteName" class="form-group">
+                        <button class="btn" onclick="saveWebsiteName()">Save</button>
+                    </div>
+                </div>
+
+                <!-- Admins Tab -->
+                <div class="tab-pane" id="admins">
+                    <h2>Manage Admins</h2>
+                    <div class="card">
+                        <h3>Add New Admin</h3>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="newAdminEmail">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="newAdminPassword">
+                        </div>
+                        <button class="btn btn-success" onclick="addAdmin()">Add Admin</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminsTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Notifications Tab -->
+                <div class="tab-pane" id="notifications">
+                    <h2>Send Notification</h2>
+                    <div class="card">
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea id="notificationMessage" rows="4" style="width: 100%; padding: 0.5rem;"></textarea>
+                        </div>
+                        <button class="btn btn-success" onclick="sendNotification()">Send to All Users</button>
+                    </div>
+                    <h3>Notification History</h3>
+                    <div id="notificationsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Teacher Modal -->
+    <div class="modal" id="addTeacherModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('addTeacherModal')">&times;</span>
+            <h2>Add New Teacher</h2>
+            <div class="form-group">
+                <label>Token</label>
+                <input type="text" id="newTeacherToken">
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="newTeacherName">
+            </div>
+            <button class="btn btn-success" onclick="saveNewTeacher()">Add Teacher</button>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Admin credentials
+        const ADMIN_EMAIL = "atifqmi@gmail.com";
+        const ADMIN_PASSWORD = "kistan**1";
+
+        // Initialize data
+        if (!localStorage.getItem('admins')) {
+            localStorage.setItem('admins', JSON.stringify([{ email: ADMIN_EMAIL, password: ADMIN_PASSWORD }]));
+        }
+
+        if (!localStorage.getItem('categories')) {
+            localStorage.setItem('categories', JSON.stringify(['Attendance', 'Time Table', 'Events']));
+        }
+
+        if (!localStorage.getItem('notifications')) {
+            localStorage.setItem('notifications', JSON.stringify([]));
+        }
+
+        let currentAdmin = null;
+
+        function adminLogin() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                currentAdmin = email;
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                showNotification('Login successful!', 'success');
+                loadDashboard();
+                loadTeachers();
+                loadAttendance();
+                loadAdmins();
+                loadCategories();
+                loadSettings();
+                loadNotifications();
+            } else {
+                showNotification('Invalid credentials!', 'error');
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load tab-specific data
+            if (tabId === 'dashboard') loadDashboard();
+            else if (tabId === 'teachers') loadTeachers();
+            else if (tabId === 'attendance') loadAttendance();
+            else if (tabId === 'timetable') loadTimetableForEdit();
+            else if (tabId === 'admins') loadAdmins();
+            else if (tabId === 'categories') loadCategories();
+            else if (tabId === 'settings') loadSettings();
+            else if (tabId === 'notifications') loadNotifications();
+        }
+
+        function loadDashboard() {
+            const teachers = JSON.parse(localStorage.getItem('teachers')) || [];
+            const attendance = JSON.parse(localStorage.getItem('attendance')) || [];
+            const today = new Date().toDateString();
+            
+            const todayAttendance = attendance.filter(a => new Date(a.date).toDateString() === today);
+            const presentToday = todayAttendance.length;
+            const lateToday = todayAttendance.filter(a => a.isLate).length;
+            const attendanceRate = teachers.length ? Math.round((presentToday / teachers.length) * 100) : 0;
+
+            document.getElementById('totalTeachersStat').textContent = teachers.length;
+            document.getElementB
